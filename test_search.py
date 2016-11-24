@@ -67,8 +67,8 @@ class SearchMainWindow(Gtk.Window):
 		hbox.pack_start(self.cancelButton, False, True, 0)
 
 		self.resultList = SearchResultWidget()
-
 		vbox.pack_start(hbox, False, True, 8)
+
 		self.searchResultLabel = Gtk.Label()
 		self.searchResultLabel.set_markup("<big>Search Result</big>")
 		self.scrolledwindow = Gtk.ScrolledWindow()
@@ -76,9 +76,16 @@ class SearchMainWindow(Gtk.Window):
 		self.scrolledwindow.set_vexpand(True)
 		self.scrolledwindow.add(self.resultList)
 		vbox.pack_start(self.scrolledwindow, True, True, 0)
-		stack.add_titled(vbox, "vase", "Base")
 
-		#self.resultList.connect('size-allocate', self.treeview_changed)
+		self.progressbar = Gtk.ProgressBar()
+		vbox.pack_start(self.progressbar, False, True, 0)
+		self.progressbar.pulse()
+
+		self.timeout_id = GObject.timeout_add(50, self.on_timeout, None)
+
+		stack.add_titled(vbox, "base", "Base")
+
+		# self.resultList.connect('size-allocate', self.treeview_changed)
 
 		# Second stack page (advanced)
 		label = Gtk.Label()
@@ -112,14 +119,17 @@ class SearchMainWindow(Gtk.Window):
 		# Add stack as window content
 		self.add(stack)
 
+	def on_timeout(self, user_data):
+		self.progressbar.pulse()
+		return True
+
 	def executeSearch(self, button):
 
 		self.searchButton.hide()
 		self.cancelButton.show()
 
 		self.resultList.clear()
-		self.entry.set_progress_pulse_step(0.2)
-		self.timeout_id = GObject.timeout_add(100, self.doPulse, None)
+		self.progressbar.show()
 
 		self.thread = StoppableThread(target=self.effectiveSearch)
 		self.thread.start()
@@ -146,7 +156,7 @@ class SearchMainWindow(Gtk.Window):
 			p.wait()
 			print("terminato")
 
-		self.entry.set_progress_pulse_step(0)
+		self.progressbar.hide()
 
 		self.searchButton.show()
 		self.cancelButton.hide()
@@ -171,15 +181,12 @@ class SearchMainWindow(Gtk.Window):
 
 		dialog.destroy()
 
-	def doPulse(self, user_data):
-		self.entry.progress_pulse()
-		return True
-
 
 win = SearchMainWindow()
 win.connect("delete-event", Gtk.main_quit)
 win.show_all()
 
 win.cancelButton.hide()
+win.progressbar.hide()
 
 Gtk.main()
