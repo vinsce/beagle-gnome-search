@@ -1,32 +1,10 @@
-import signal
-
-import gi, subprocess, os, threading
+import gi, subprocess, os
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject
+from gi.repository import Gtk, GObject
 from SearchResultWidget import SearchResultWidget
 from search_result import SearchResult
-
-
-class StoppableThread(threading.Thread):
-	"""Thread class with a stop() method. The thread itself has to check regularly for the stopped() condition."""
-
-	def __init__(self, target=None):
-		super(StoppableThread, self).__init__(target=target)
-		self._stop = threading.Event()
-
-	def set_pid(self, pid):
-		self.pid = pid
-
-	def stop(self):
-		self._stop = threading.Event()
-		self._stop.set()
-		if self.pid:
-			print("pid: " + str(self.pid))
-			os.kill(self.pid, signal.SIGTERM)
-
-	def stopped(self):
-		return self._stop.isSet()
+from utils.threads import StoppableThread
 
 
 class SearchMainWindow(Gtk.Window):
