@@ -63,8 +63,6 @@ class SearchMainWindow(Gtk.Window):
 
 		stack.add_titled(vbox, "base", "Base")
 
-		# self.resultList.connect('size-allocate', self.treeview_changed)
-
 		# Setting stack switcher as headerbar title
 		stack_switcher = Gtk.StackSwitcher()
 		stack_switcher.set_stack(stack)
@@ -92,9 +90,6 @@ class SearchMainWindow(Gtk.Window):
 	def cancelSearch(self, button):
 		self.thread.stop()
 
-	def treeview_changed(self, widget, event, data=None):
-		adj = self.scrolledwindow.get_vadjustment()
-		adj.set_value(adj.get_upper() - adj.get_page_size())
 
 	def effectiveSearch(self):
 		p = subprocess.Popen(["find", self.searchPath, "-iname", self.entry.get_text()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -115,12 +110,8 @@ class SearchMainWindow(Gtk.Window):
 		self.searchButton.show()
 		self.cancelButton.hide()
 
-	# if not err:
-	# for file_name in out.splitlines():
-	#	self.resultList.addItem(SearchResult(file_name.decode('utf-8')))
-
 	def on_folder_clicked(self, widget):
-		dialog = Gtk.FileChooserDialog("Please choose a folder", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+		dialog = Gtk.FileChooserDialog("Choose a folder", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
 		                                                                                                     "Select", Gtk.ResponseType.OK))
 		dialog.set_default_size(800, 400)
 
@@ -135,12 +126,16 @@ class SearchMainWindow(Gtk.Window):
 
 		dialog.destroy()
 
+	def after_show(self):
+		""" performs same initializations operation. It must be called after SearchMainWindow.show_all()"""
+		win.cancelButton.hide()
+		win.progressbar.hide()
+
 
 win = SearchMainWindow()
 win.connect("delete-event", Gtk.main_quit)
 win.show_all()
 
-win.cancelButton.hide()
-win.progressbar.hide()
+win.after_show()
 
 Gtk.main()
