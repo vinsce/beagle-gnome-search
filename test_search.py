@@ -37,7 +37,7 @@ class SearchMainWindow(Gtk.Window):
 		Gtk.Window.__init__(self, title="HeaderBar Demo")
 		self.set_border_width(10)
 		self.set_default_size(400, 200)
-		self.searchPath = "/home/vinsce/Sviluppo"
+		self.searchPath = os.path.expanduser("~")
 
 		# Headerbar initialization
 		hb = Gtk.HeaderBar()
@@ -51,7 +51,7 @@ class SearchMainWindow(Gtk.Window):
 		# First stack page (simple)
 		hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-		self.folderButton = Gtk.Button("Folder: " + self.searchPath)
+		self.folderButton = Gtk.Button("Path: " + os.path.split(self.searchPath)[1])
 		self.folderButton.connect("clicked", self.on_folder_clicked)
 		self.entry = Gtk.SearchEntry()
 		self.entry.set_text("test*")
@@ -87,34 +87,11 @@ class SearchMainWindow(Gtk.Window):
 
 		# self.resultList.connect('size-allocate', self.treeview_changed)
 
-		# Second stack page (advanced)
-		label = Gtk.Label()
-		label.set_markup("<big>A fancy label</big>")
-		stack.add_titled(label, "advanced", "Advanced")
-
 		# Setting stack switcher as headerbar title
 		stack_switcher = Gtk.StackSwitcher()
 		stack_switcher.set_stack(stack)
 		hb.set_custom_title(stack_switcher)
 		self.set_titlebar(hb)
-
-		# Headerbar right buttons
-		button = Gtk.Button()
-		icon = Gio.ThemedIcon(name="mail-send-receive-symbolic")
-		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-		button.add(image)
-		hb.pack_end(button)
-
-		# Headerbar left buttons
-		box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-		Gtk.StyleContext.add_class(box.get_style_context(), "linked")
-		button = Gtk.Button()
-		button.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
-		box.add(button)
-		button = Gtk.Button()
-		button.add(Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE))
-		box.add(button)
-		hb.pack_start(box)
 
 		# Add stack as window content
 		self.add(stack)
@@ -154,7 +131,6 @@ class SearchMainWindow(Gtk.Window):
 				if self.thread.stopped():
 					break
 			p.wait()
-			print("terminato")
 
 		self.progressbar.hide()
 
