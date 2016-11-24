@@ -1,8 +1,11 @@
-import gi, subprocess, os
+import gi
+import os
+import subprocess
 
 gi.require_version('Gtk', '3.0')
+
 from gi.repository import Gtk, GObject
-from SearchResultWidget import SearchResultWidget
+from views.search_result_view import SearchResultView
 from search_result import SearchResult
 from utils.threads import StoppableThread
 
@@ -44,7 +47,7 @@ class SearchMainWindow(Gtk.Window):
 		hbox.pack_start(self.searchButton, False, True, 0)
 		hbox.pack_start(self.cancelButton, False, True, 0)
 
-		self.resultList = SearchResultWidget()
+		self.resultList = SearchResultView()
 		vbox.pack_start(hbox, False, True, 8)
 
 		self.searchResultLabel = Gtk.Label()
@@ -77,7 +80,6 @@ class SearchMainWindow(Gtk.Window):
 		return True
 
 	def executeSearch(self, button):
-
 		self.searchButton.hide()
 		self.cancelButton.show()
 
@@ -89,7 +91,6 @@ class SearchMainWindow(Gtk.Window):
 
 	def cancelSearch(self, button):
 		self.thread.stop()
-
 
 	def effectiveSearch(self):
 		p = subprocess.Popen(["find", self.searchPath, "-iname", self.entry.get_text()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -112,7 +113,7 @@ class SearchMainWindow(Gtk.Window):
 
 	def on_folder_clicked(self, widget):
 		dialog = Gtk.FileChooserDialog("Choose a folder", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-		                                                                                                     "Select", Gtk.ResponseType.OK))
+		                                                                                              "Select", Gtk.ResponseType.OK))
 		dialog.set_default_size(800, 400)
 
 		response = dialog.run()
@@ -128,14 +129,5 @@ class SearchMainWindow(Gtk.Window):
 
 	def after_show(self):
 		""" performs same initializations operation. It must be called after SearchMainWindow.show_all()"""
-		win.cancelButton.hide()
-		win.progressbar.hide()
-
-
-win = SearchMainWindow()
-win.connect("delete-event", Gtk.main_quit)
-win.show_all()
-
-win.after_show()
-
-Gtk.main()
+		self.cancelButton.hide()
+		self.progressbar.hide()

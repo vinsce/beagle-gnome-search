@@ -7,7 +7,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, Gdk
 
 
-class SearchResultWidget(Gtk.TreeView):
+class SearchResultView(Gtk.TreeView):
 	def __init__(self):
 		self.liststore = Gtk.ListStore(str, str, str, str)
 		Gtk.Window.__init__(self, model=self.liststore)
