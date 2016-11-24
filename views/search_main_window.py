@@ -1,12 +1,12 @@
 import gi
 import os
-import subprocess
+
+from search.find_search import default_search
 
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, GObject
 from views.search_result_view import SearchResultView
-from search_result import SearchResult
 from utils.threads import StoppableThread
 
 
@@ -82,10 +82,12 @@ class SearchMainWindow(Gtk.Window):
 	def executeSearch(self, button):
 		self.searchButton.hide()
 		self.cancelButton.show()
-
-		self.resultList.clear()
 		self.progressbar.show()
 
+		# clears old search result
+		self.resultList.clear()
+
+		# creates and starts a new thread
 		self.thread = StoppableThread(target=self.effectiveSearch)
 		self.thread.start()
 
@@ -93,19 +95,10 @@ class SearchMainWindow(Gtk.Window):
 		self.thread.stop()
 
 	def effectiveSearch(self):
-		p = subprocess.Popen(["find", self.searchPath, "-iname", self.entry.get_text()], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		self.thread.set_pid(p.pid)
-		# out, err = p.communicate()
-		# self.searchResultLabel.set_markup("Out: "+out.decode('utf-8') + "\nErr: "+err.decode('utf-8'))
+		default_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.resultList,
+		               completed_function=self.search_complete)
 
-		with p.stdout:
-			for line in iter(p.stdout.readline, b''):
-				file_name = line.rstrip().decode('utf-8')
-				self.resultList.addItem(SearchResult(file_name))
-				if self.thread.stopped():
-					break
-			p.wait()
-
+	def search_complete(self):
 		self.progressbar.hide()
 
 		self.searchButton.show()
