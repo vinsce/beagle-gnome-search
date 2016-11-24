@@ -12,10 +12,10 @@ from utils.threads import StoppableThread
 
 class SearchMainWindow(Gtk.Window):
 	def __init__(self):
-		self.thread = StoppableThread(target=self.effectiveSearch)
+		self.thread = None
 
 		# Window configurations
-		Gtk.Window.__init__(self, title="HeaderBar Demo")
+		Gtk.Window.__init__(self, title="Search")
 		self.set_border_width(10)
 		self.set_default_size(400, 200)
 		self.searchPath = os.path.expanduser("~")
@@ -37,12 +37,12 @@ class SearchMainWindow(Gtk.Window):
 		self.entry = Gtk.SearchEntry()
 		self.entry.set_text("test*")
 		self.searchButton = Gtk.Button.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON)
-		self.searchButton.connect("clicked", self.executeSearch)
+		self.searchButton.connect("clicked", self.execute_search)
 
 		self.cancelButton = Gtk.Button.new_from_icon_name("edit-clear-all-symbolic", Gtk.IconSize.BUTTON)
-		self.cancelButton.connect("clicked", self.cancelSearch)
+		self.cancelButton.connect("clicked", self.cancel_search)
 
-		hbox.pack_start(self.folderButton, False, True, 8)
+		hbox.pack_start(self.folderButton, False, True, 4)
 		hbox.pack_start(self.entry, True, True, 8)
 		hbox.pack_start(self.searchButton, False, True, 0)
 		hbox.pack_start(self.cancelButton, False, True, 0)
@@ -50,8 +50,6 @@ class SearchMainWindow(Gtk.Window):
 		self.resultList = SearchResultView()
 		vbox.pack_start(hbox, False, True, 8)
 
-		self.searchResultLabel = Gtk.Label()
-		self.searchResultLabel.set_markup("<big>Search Result</big>")
 		self.scrolledwindow = Gtk.ScrolledWindow()
 		self.scrolledwindow.set_hexpand(False)
 		self.scrolledwindow.set_vexpand(True)
@@ -79,7 +77,7 @@ class SearchMainWindow(Gtk.Window):
 		self.progressbar.pulse()
 		return True
 
-	def executeSearch(self, button):
+	def execute_search(self, button):
 		self.searchButton.hide()
 		self.cancelButton.show()
 		self.progressbar.show()
@@ -88,13 +86,13 @@ class SearchMainWindow(Gtk.Window):
 		self.resultList.clear()
 
 		# creates and starts a new thread
-		self.thread = StoppableThread(target=self.effectiveSearch)
+		self.thread = StoppableThread(target=self.effective_search)
 		self.thread.start()
 
-	def cancelSearch(self, button):
+	def cancel_search(self, button):
 		self.thread.stop()
 
-	def effectiveSearch(self):
+	def effective_search(self):
 		default_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.resultList,
 		               completed_function=self.search_complete)
 
@@ -105,8 +103,8 @@ class SearchMainWindow(Gtk.Window):
 		self.cancelButton.hide()
 
 	def on_folder_clicked(self, widget):
-		dialog = Gtk.FileChooserDialog("Choose a folder", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-		                                                                                              "Select", Gtk.ResponseType.OK))
+		dialog = Gtk.FileChooserDialog("Choose a folder", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select",
+		                                                                                              Gtk.ResponseType.OK))
 		dialog.set_default_size(800, 400)
 
 		response = dialog.run()
