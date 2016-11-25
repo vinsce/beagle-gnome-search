@@ -14,7 +14,7 @@ class Application(Gtk.Application):
 		super().__init__(*args, application_id="org.storyteller.gsearch", flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE, **kwargs)
 		self.window = None
 
-		self.add_main_option("base", ord("b"), GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Command line test", None)
+		self.add_main_option("base", ord("b"), GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Open directly the base search screen", None)
 
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
@@ -50,7 +50,8 @@ class Application(Gtk.Application):
 
 	# Functions used to handle top menu actions: about, quit and preferences
 	def on_about(self, action, param):
-		about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)
+		about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True, authors=["<a href=\"mailto:vincenzo.cerminara94@gmail.com\">Vincenzo Cerminara</a>"], comments="A multiversal search tool for GNOME.",
+		                               version="0.1", program_name="GSearch")
 		about_dialog.present()
 
 	def on_quit(self, action, param):
