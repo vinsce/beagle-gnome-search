@@ -2,7 +2,7 @@ import os
 
 import gi
 
-from source.search.find_search import default_search
+from search.find_search import default_search
 
 gi.require_version('Gtk', '3.0')
 
@@ -20,7 +20,7 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 
 		# Window configurations
 		self.set_border_width(0)
-		self.set_default_size(400, 200)
+		self.set_default_size(600, 400)
 		self.searchPath = os.path.expanduser("~")
 
 		# Headerbar initialization

@@ -7,7 +7,7 @@ from gi.repository import Gio
 from utils import files
 
 
-class SearchResult():
+class SearchResult:
 	def __init__(self, file_path):
 		full_path = os.path.abspath(file_path)
 		self.path = os.path.split(full_path)[0]

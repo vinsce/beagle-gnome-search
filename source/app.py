@@ -1,3 +1,4 @@
+import os
 import sys
 
 import gi
@@ -10,10 +11,10 @@ from gi.repository import GLib, Gio, Gtk
 
 class Application(Gtk.Application):
 	def __init__(self, *args, **kwargs):
-		super().__init__(*args, application_id="org.example.myapp", flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE, **kwargs)
+		super().__init__(*args, application_id="org.storyteller.gsearch", flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE, **kwargs)
 		self.window = None
 
-		self.add_main_option("test", ord("t"), GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Command line test", None)
+		self.add_main_option("base", ord("b"), GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Command line test", None)
 
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
@@ -28,9 +29,8 @@ class Application(Gtk.Application):
 
 		action = Gio.SimpleAction.new("preferences", None)
 		action.connect("activate", self.on_preferences)
-		#self.add_action(action)
-
-		builder = Gtk.Builder.new_from_file("res/xml/app_menu.xml")
+		# self.add_action(action)
+		builder = Gtk.Builder.new_from_file(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "res", "xml", "app_menu.xml"))
 		self.set_app_menu(builder.get_object("app-menu"))
 
 	def do_activate(self):
@@ -41,13 +41,14 @@ class Application(Gtk.Application):
 	def do_command_line(self, command_line):
 		options = command_line.get_options_dict()
 
-		if options.contains("test"):
-			# This is printed on the main instance
-			print("Test argument recieved")
+		if options.contains("base"):
+			# TODO This will be used to show the right search page: base, simple, etc
+			print("Base argument recieved")
 
 		self.activate()
 		return 0
 
+	# Functions used to handle top menu actions: about, quit and preferences
 	def on_about(self, action, param):
 		about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)
 		about_dialog.present()
@@ -56,6 +57,7 @@ class Application(Gtk.Application):
 		self.quit()
 
 	def on_preferences(self, action, param):
+		# TODO add preference dialog
 		pass
 
 
