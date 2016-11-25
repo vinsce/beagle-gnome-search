@@ -15,6 +15,8 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		super().__init__(*args, **kwargs)
 		self.thread = None
 
+		self.set_wmclass("Hello World", "Hello World")
+
 		# Window configurations
 		self.set_border_width(0)
 		self.set_default_size(400, 200)
@@ -83,7 +85,7 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		# Add stack as window content
 		self.add(stack)
 
-		#self.connect("delete-event", Gtk.main_quit)
+		# self.connect("delete-event", Gtk.main_quit)
 		self.show_all()
 
 		self.after_show()
