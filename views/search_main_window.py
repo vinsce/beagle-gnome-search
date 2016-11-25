@@ -36,6 +36,7 @@ class SearchMainWindow(Gtk.Window):
 		self.folderButton.connect("clicked", self.on_folder_clicked)
 		self.entry = Gtk.SearchEntry()
 		self.entry.set_text("test*")
+		self.entry.connect("activate", self.execute_search)
 		self.searchButton = Gtk.Button.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON)
 		self.searchButton.connect("clicked", self.execute_search)
 
