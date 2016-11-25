@@ -1,3 +1,6 @@
+# This file is no more used
+# The app.py is now used to launch the program
+
 import gi
 
 from source.views.search_main_window import SearchMainWindow

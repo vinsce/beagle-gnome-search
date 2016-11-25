@@ -1,6 +1,6 @@
 import subprocess
 
-from search_result import SearchResult
+from search.search_result import SearchResult
 
 
 def default_search(query, path, thread=None, result_list=None, completed_function=None):
