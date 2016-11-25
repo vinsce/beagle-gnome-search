@@ -20,6 +20,8 @@ class SimpleSearchPage(Gtk.Box):
 		self.searchDirectory = True
 		self.searchLink = True
 		self.ignoreCase = True
+		self.max_size = ""
+
 		self.gtk_window = gtk_window
 
 		self.left_panel = Gtk.ListBox()
@@ -80,6 +82,17 @@ class SimpleSearchPage(Gtk.Box):
 		checkboxes_box.pack_start(self.file_type_folder_button, False, False, 0)
 		checkboxes_box.pack_start(self.file_type_link_button, False, False, 0)
 		file_types_box.pack_end(checkboxes_box, False, False, 0)
+		self.left_panel.add(row)
+
+		# Max size
+		row = Gtk.ListBoxRow()
+		max_size_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=72)
+		row.add(max_size_box)
+		max_size_label = Gtk.Label(xalign=0)
+		max_size_label.set_markup("<b>Max size</b>")
+		self.max_size_entry = Gtk.Entry()
+		max_size_box.pack_start(max_size_label, True, True, 0)
+		max_size_box.pack_end(self.max_size_entry, False, True, 0)
 		self.left_panel.add(row)
 
 		# Search result view
@@ -156,8 +169,9 @@ class SimpleSearchPage(Gtk.Box):
 		self.thread.stop()
 
 	def effective_search(self):
+		self.max_size = self.max_size_entry.get_text()
 		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.resultList, completed_function=self.search_complete, ignore_case=self.ignoreCase, search_file=self.searchFile,
-		              search_folder=self.searchDirectory)
+		              search_folder=self.searchDirectory, max_size=self.max_size)
 
 	def search_complete(self):
 		self.progressbar.hide()

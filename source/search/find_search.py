@@ -23,7 +23,7 @@ def default_search(query, path, thread=None, result_list=None, completed_functio
 		completed_function()
 
 
-def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True):
+def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=""):
 	if ignore_case:
 		ignore_case_string = "-iname"
 	else:
@@ -38,6 +38,32 @@ def simple_search(query, path, thread=None, result_list=None, completed_function
 
 	command = ["find", path]
 
+	if max_size != "":
+		ok = True
+		try:
+			numeric_value = int(max_size[:-1])
+		except:
+			print("Invalid size")
+			numeric_value = 0
+			ok = False
+		unit_value = max_size[-1:]
+		if unit_value == "G":
+			byte_value = numeric_value * 1073741824
+		elif unit_value == "M":
+			byte_value = numeric_value * 1048576
+		elif unit_value == "k":
+			byte_value = numeric_value * 1024
+		elif unit_value == "c":
+			byte_value = numeric_value
+		elif unit_value == "b":
+			byte_value = numeric_value * 512
+		else:
+			ok = False
+
+		if ok:
+			command.append("-size")
+			command.append("-" + str(byte_value) + "c")
+
 	command.append(r'\(')
 	for t in search_type_string:
 		command.append("-type")
@@ -51,7 +77,7 @@ def simple_search(query, path, thread=None, result_list=None, completed_function
 	if thread:
 		thread.set_pid(p.pid)
 
-	#with p.stderr:
+	# with p.stderr:
 	#	for line in iter(p.stderr.readline, b''):
 	#		print("err: " + str(line))
 	#	p.wait()
