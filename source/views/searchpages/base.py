@@ -110,6 +110,5 @@ class BaseSearchPage(Gtk.Box):
 		dialog.destroy()
 
 	def after_show(self):
-		""" performs same initializations operation. It must be called after SearchMainWindow.show_all()"""
 		self.cancelButton.hide()
 		self.progressbar.hide()

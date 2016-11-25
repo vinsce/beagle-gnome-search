@@ -11,10 +11,12 @@ from gi.repository import GLib, Gio, Gtk
 
 class Application(Gtk.Application):
 	def __init__(self, *args, **kwargs):
+		self.default_search_page = "base"
 		super().__init__(*args, application_id="org.storyteller.gsearch", flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE, **kwargs)
 		self.window = None
 
 		self.add_main_option("base", ord("b"), GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Open directly the base search screen", None)
+		self.add_main_option("simple", ord("s"), GLib.OptionFlags.NONE, GLib.OptionArg.NONE, "Open directly the base search screen", None)
 
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
@@ -35,7 +37,8 @@ class Application(Gtk.Application):
 
 	def do_activate(self):
 		if not self.window:
-			self.window = SearchMainWindow(application=self, title="Main Window")
+			print("activting")
+			self.window = SearchMainWindow(application=self, title="Main Window", page=self.default_search_page)
 		self.window.present()
 
 	def do_command_line(self, command_line):
@@ -44,6 +47,11 @@ class Application(Gtk.Application):
 		if options.contains("base"):
 			# TODO This will be used to show the right search page: base, simple, etc
 			print("Base argument recieved")
+			self.default_search_page = "base"
+		elif options.contains("simple"):
+			# TODO This will be used to show the right search page: base, simple, etc
+			print("Simple argument recieved")
+			self.default_search_page = "simple"
 
 		self.activate()
 		return 0
