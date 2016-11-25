@@ -10,12 +10,12 @@ from views.search_result_view import SearchResultView
 from utils.threads import StoppableThread
 
 
-class SearchMainWindow(Gtk.Window):
-	def __init__(self):
+class SearchMainWindow(Gtk.ApplicationWindow):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 		self.thread = None
 
 		# Window configurations
-		Gtk.Window.__init__(self, title="Search")
 		self.set_border_width(0)
 		self.set_default_size(400, 200)
 		self.searchPath = os.path.expanduser("~")
@@ -82,6 +82,11 @@ class SearchMainWindow(Gtk.Window):
 
 		# Add stack as window content
 		self.add(stack)
+
+		#self.connect("delete-event", Gtk.main_quit)
+		self.show_all()
+
+		self.after_show()
 
 	def on_timeout(self, user_data):
 		self.progressbar.pulse()
