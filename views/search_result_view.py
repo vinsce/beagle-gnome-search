@@ -10,7 +10,7 @@ from gi.repository import Gtk, Gio, Gdk
 class SearchResultView(Gtk.TreeView):
 	def __init__(self):
 		self.liststore = Gtk.ListStore(str, str, str, str)
-		Gtk.Window.__init__(self, model=self.liststore)
+		Gtk.TreeView.__init__(self, model=self.liststore)
 
 		renderer_pixbuf = Gtk.CellRendererPixbuf()
 		column_pixbuf = Gtk.TreeViewColumn("", renderer_pixbuf, icon_name=0)
@@ -32,9 +32,53 @@ class SearchResultView(Gtk.TreeView):
 		renderer_size = Gtk.CellRendererText()
 		column_size = Gtk.TreeViewColumn("Size", renderer_size, text=3)
 		column_size.set_sort_column_id(3)
+		self.liststore.set_sort_func(3, self.size_sort_func)
 		self.set_default_column_properties(column_size)
 		self.append_column(column_size)
 		self.connect('button-press-event', self.button_press_event)
+
+	def size_sort_func(self, model, row1, row2, user_data):
+		sort_column = 3
+
+		value1 = model.get_value(row1, sort_column)
+		value2 = model.get_value(row2, sort_column)
+
+		if value1.endswith("PB"):
+			num_v1 = float(value1[:-2]) * (2 ** 50)
+		elif value1.endswith("TB"):
+			num_v1 = float(value1[:-2]) * (2 ** 40)
+		elif value1.endswith("GB"):
+			num_v1 = float(value1[:-2]) * (2 ** 30)
+		elif value1.endswith("MB"):
+			num_v1 = float(value1[:-2]) * (2 ** 20)
+		elif value1.endswith("KB"):
+			num_v1 = float(value1[:-2]) * (2 ** 10)
+		elif value1.endswith("B"):
+			num_v1 = float(value1[:-1])
+		else:
+			num_v1 = 0
+		
+		if value2.endswith("PB"):
+			num_v2 = float(value2[:-2]) * (2 ** 50)
+		elif value2.endswith("TB"):
+			num_v2 = float(value2[:-2]) * (2 ** 40)
+		elif value2.endswith("GB"):
+			num_v2 = float(value2[:-2]) * (2 ** 30)
+		elif value2.endswith("MB"):
+			num_v2 = float(value2[:-2]) * (2 ** 20)
+		elif value2.endswith("KB"):
+			num_v2 = float(value2[:-2]) * (2 ** 10)
+		elif value2.endswith("B"):
+			num_v2 = float(value2[:-1])
+		else:
+			num_v2 = 0
+
+		if num_v1 < num_v2:
+			return -1
+		elif num_v1 == num_v2:
+			return 0
+		else:
+			return 1
 
 	def addItem(self, search_result):
 		result_array = search_result.toArray()
