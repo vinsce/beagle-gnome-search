@@ -1,5 +1,6 @@
-from views.search_main_window import SearchMainWindow
 import gi
+
+from source.views.search_main_window import SearchMainWindow
 
 gi.require_version('Gtk', '3.0')
 

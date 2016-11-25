@@ -34,13 +34,8 @@ class Application(Gtk.Application):
 		self.set_app_menu(builder.get_object("app-menu"))
 
 	def do_activate(self):
-		# We only allow a single window and raise any existing ones
 		if not self.window:
-			# Windows are associated with the application
-			# when the last one is closed the application shuts down
 			self.window = SearchMainWindow(application=self, title="Main Window")
-			self.window.set_wmclass("Hello World", "Hello World")
-
 		self.window.present()
 
 	def do_command_line(self, command_line):

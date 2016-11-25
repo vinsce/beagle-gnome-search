@@ -1,7 +1,8 @@
-import gi
 import os
 
-from search.find_search import default_search
+import gi
+
+from source.search.find_search import default_search
 
 gi.require_version('Gtk', '3.0')
 
