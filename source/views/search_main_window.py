@@ -2,7 +2,7 @@ import os
 
 import gi
 
-from views.searchpages import base
+from views.searchpages import base, simple
 
 gi.require_version('Gtk', '3.0')
 
@@ -31,6 +31,9 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		self.base_page = base.BaseSearchPage(gtk_window=self)
 		stack.add_titled(self.base_page, "base", "Base")
 
+		self.simple_page = simple.SimpleSearchPage(gtk_window=self)
+		stack.add_titled(self.simple_page, "simple", "Simple")
+
 		# Setting stack switcher as headerbar title
 		stack_switcher = Gtk.StackSwitcher()
 		stack_switcher.set_stack(stack)
@@ -48,3 +51,4 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 	def after_show(self):
 		""" performs same initializations operation. It must be called after SearchMainWindow.show_all()"""
 		self.base_page.after_show()
+		self.simple_page.after_show()
