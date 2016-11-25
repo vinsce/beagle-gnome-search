@@ -2,13 +2,11 @@ import os
 
 import gi
 
-from search.find_search import default_search
+from views.searchpages import base
 
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GObject
-from views.search_result_view import SearchResultView
-from utils.threads import StoppableThread
+from gi.repository import Gtk
 
 
 class SearchMainWindow(Gtk.ApplicationWindow):
@@ -16,12 +14,9 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		super().__init__(*args, **kwargs)
 		self.thread = None
 
-		self.set_wmclass("Hello World", "Hello World")
-
 		# Window configurations
 		self.set_border_width(0)
-		self.set_default_size(600, 400)
-		self.searchPath = os.path.expanduser("~")
+		self.set_default_size(800, 500)
 
 		# Headerbar initialization
 		hb = Gtk.HeaderBar()
@@ -32,50 +27,9 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
 		stack.set_transition_duration(1000)
 
-		# First stack page (simple)
-		hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
-		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-		self.folderButton = Gtk.Button("Path: " + os.path.split(self.searchPath)[1])
-		self.folderButton.connect("clicked", self.on_folder_clicked)
-		self.entry = Gtk.SearchEntry()
-		self.entry.set_text("test*")
-		self.entry.connect("activate", self.execute_search)
-		self.searchButton = Gtk.Button.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON)
-		self.searchButton.connect("clicked", self.execute_search)
-
-		self.cancelButton = Gtk.Button.new_from_icon_name("edit-clear-all-symbolic", Gtk.IconSize.BUTTON)
-		self.cancelButton.connect("clicked", self.cancel_search)
-
-		hbox.pack_start(self.folderButton, False, True, 12)
-		hbox.pack_start(self.entry, True, True, 0)
-		hbox.pack_start(self.searchButton, False, True, 6)
-		hbox.pack_start(self.cancelButton, False, True, 0)
-
-		self.resultList = SearchResultView()
-		vbox.pack_start(hbox, False, True, 8)
-
-		self.scrolledwindow = Gtk.ScrolledWindow()
-		self.scrolledwindow.set_hexpand(False)
-		self.scrolledwindow.set_vexpand(True)
-		self.scrolledwindow.add(self.resultList)
-		self.scrolledwindow.set_margin_bottom(0)
-		vbox.pack_start(self.scrolledwindow, True, True, 0)
-
-		self.progressbar = Gtk.ProgressBar()
-		vbox.pack_start(self.progressbar, False, True, 0)
-		self.progressbar.pulse()
-
-		self.timeout_id = GObject.timeout_add(50, self.on_timeout, None)
-
-		self.statusbar = Gtk.Statusbar()
-		self.context_id = self.statusbar.get_context_id("search_cid")
-		self.statusbar.push(self.context_id, "Searching is fun!")
-		self.statusbar.set_margin_bottom(0)
-		self.statusbar.set_margin_top(0)
-		self.statusbar.set_margin_left(0)
-		vbox.pack_start(self.statusbar, False, False, 0)
-
-		stack.add_titled(vbox, "base", "Base")
+		# First stack page (base)
+		self.base_page = base.BaseSearchPage(gtk_window=self)
+		stack.add_titled(self.base_page, "base", "Base")
 
 		# Setting stack switcher as headerbar title
 		stack_switcher = Gtk.StackSwitcher()
@@ -91,58 +45,6 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 
 		self.after_show()
 
-	def on_timeout(self, user_data):
-		self.progressbar.pulse()
-		return True
-
-	def execute_search(self, button):
-		self.searchButton.hide()
-		self.cancelButton.show()
-		self.progressbar.show()
-
-		# clears old search result
-		self.resultList.clear()
-
-		# creates and starts a new thread
-		self.thread = StoppableThread(target=self.effective_search)
-		self.thread.start()
-		self.statusbar.push(self.context_id, "Search started...")
-
-	def cancel_search(self, button):
-		self.thread.stop()
-
-	def effective_search(self):
-		default_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.resultList,
-		               completed_function=self.search_complete)
-
-	def search_complete(self):
-		self.progressbar.hide()
-
-		self.searchButton.show()
-		self.cancelButton.hide()
-
-		if self.thread.stopped():
-			self.statusbar.push(self.context_id, "Search Canceled")
-		else:
-			self.statusbar.push(self.context_id, "Search Completed")
-
-	def on_folder_clicked(self, widget):
-		dialog = Gtk.FileChooserDialog("Choose a folder", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select",
-		                                                                                              Gtk.ResponseType.OK))
-		dialog.set_default_size(800, 400)
-
-		response = dialog.run()
-		if response == Gtk.ResponseType.OK:
-			print("Select clicked")
-			print("Folder selected: " + dialog.get_filename())
-			self.folderButton.set_label("Path: " + os.path.split(dialog.get_filename())[1])
-			self.searchPath = dialog.get_filename()
-		elif response == Gtk.ResponseType.CANCEL:
-			print("Cancel clicked")
-
-		dialog.destroy()
-
 	def after_show(self):
 		""" performs same initializations operation. It must be called after SearchMainWindow.show_all()"""
-		self.cancelButton.hide()
-		self.progressbar.hide()
+		self.base_page.after_show()
