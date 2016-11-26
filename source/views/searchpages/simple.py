@@ -4,6 +4,7 @@ import gi
 
 from search.find_search import default_search, simple_search
 from utils.threads import StoppableThread
+from views.file_size_units_view import FileSizeUnitsView
 from views.search_result_view import SearchResultView
 
 gi.require_version('Gtk', '3.0')
@@ -49,7 +50,7 @@ class SimpleSearchPage(Gtk.Box):
 		# Left panel: search parameters
 		# Ignore case switch
 		row = Gtk.ListBoxRow()
-		ignore_case_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=72)
+		ignore_case_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
 		row.add(ignore_case_box)
 		ignore_case_label = Gtk.Label(xalign=0)
 		ignore_case_label.set_markup("<b>Ignore case</b>")
@@ -62,9 +63,9 @@ class SimpleSearchPage(Gtk.Box):
 
 		# File Type checkboxes
 		row = Gtk.ListBoxRow()
-		file_types_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=72)
+		file_types_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
 		row.add(file_types_box)
-		file_types_label = Gtk.Label()
+		file_types_label = Gtk.Label(xalign=0)
 		file_types_label.set_markup("<b>Types</b>")
 		self.file_type_file_button = Gtk.CheckButton.new_with_label("File")
 		self.file_type_file_button.connect("toggled", self.on_button_toggled, "file")
@@ -76,23 +77,34 @@ class SimpleSearchPage(Gtk.Box):
 		self.file_type_link_button.set_active(True)
 		self.file_type_link_button.connect("toggled", self.on_button_toggled, "link")
 
-		file_types_box.pack_start(file_types_label, True, False, 0)
+		file_types_box.pack_start(file_types_label, True, True, 0)
 		checkboxes_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
 		checkboxes_box.pack_start(self.file_type_file_button, True, False, 0)
 		checkboxes_box.pack_start(self.file_type_folder_button, False, False, 0)
 		checkboxes_box.pack_start(self.file_type_link_button, False, False, 0)
-		file_types_box.pack_end(checkboxes_box, False, False, 0)
+		file_types_box.pack_end(checkboxes_box, False, True, 0)
 		self.left_panel.add(row)
 
 		# Max size
 		row = Gtk.ListBoxRow()
-		max_size_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=72)
+		max_size_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=48)
 		row.add(max_size_box)
 		max_size_label = Gtk.Label(xalign=0)
 		max_size_label.set_markup("<b>Max size</b>")
-		self.max_size_entry = Gtk.Entry()
+		self.max_size_view = FileSizeUnitsView()
 		max_size_box.pack_start(max_size_label, True, True, 0)
-		max_size_box.pack_end(self.max_size_entry, False, True, 0)
+		max_size_box.pack_end(self.max_size_view, False, True, 0)
+		self.left_panel.add(row)
+
+		# Min size
+		row = Gtk.ListBoxRow()
+		min_size_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=48)
+		row.add(min_size_box)
+		min_size_label = Gtk.Label(xalign=0)
+		min_size_label.set_markup("<b>Min size</b>")
+		self.min_size_view = FileSizeUnitsView()
+		min_size_box.pack_start(min_size_label, True, True, 0)
+		min_size_box.pack_end(self.min_size_view, False, True, 0)
 		self.left_panel.add(row)
 
 		# Search result view
@@ -140,6 +152,8 @@ class SimpleSearchPage(Gtk.Box):
 				self.searchFile = True
 			elif name == "folder":
 				self.searchDirectory = True
+			if name == "link":
+				self.searchLink = True
 		else:
 			if name == "file":
 				self.searchFile = False
@@ -169,9 +183,8 @@ class SimpleSearchPage(Gtk.Box):
 		self.thread.stop()
 
 	def effective_search(self):
-		self.max_size = self.max_size_entry.get_text()
 		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.resultList, completed_function=self.search_complete, ignore_case=self.ignoreCase, search_file=self.searchFile,
-		              search_folder=self.searchDirectory, max_size=self.max_size)
+		              search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte())
 
 	def search_complete(self):
 		self.progressbar.hide()
