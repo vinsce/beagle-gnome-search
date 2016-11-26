@@ -57,7 +57,7 @@ class SearchResultView(Gtk.TreeView):
 			num_v1 = float(value1[:-1])
 		else:
 			num_v1 = 0
-		
+
 		if value2.endswith("PB"):
 			num_v2 = float(value2[:-2]) * (2 ** 50)
 		elif value2.endswith("TB"):
@@ -101,6 +101,7 @@ class SearchResultView(Gtk.TreeView):
 		if event.button == 3:  # right click
 			tree_path = self.get_path_at_pos(int(event.x), int(event.y))[0]
 			menu = Gtk.Menu()
+			menu.attach_to_widget(widget)
 
 			menu_item_nautilus = Gtk.MenuItem("Show in Nautilus")
 			menu_item_nautilus.connect("activate", self.open_nautilus, tree_path)
