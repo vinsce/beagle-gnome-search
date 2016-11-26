@@ -205,9 +205,9 @@ class SimpleSearchPage(Gtk.Box):
 		self.cancel_button.hide()
 
 		if self.thread.stopped():
-			self.status_bar.push(self.context_id, "Search Canceled")
+			self.status_bar.push(self.context_id, "Search Canceled: %s results" % self.result_list.get_number_of_results())
 		else:
-			self.status_bar.push(self.context_id, "Search Completed")
+			self.status_bar.push(self.context_id, "Search Completed: %s results" % self.result_list.get_number_of_results())
 
 		self.result_list.set_is_searching(False)
 

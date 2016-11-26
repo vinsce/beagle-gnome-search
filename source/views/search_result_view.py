@@ -141,3 +141,6 @@ class SearchResultView(Gtk.TreeView):
 		self.column_name.set_clickable(not searching)
 		self.column_path.set_clickable(not searching)
 		self.column_size.set_clickable(not searching)
+
+	def get_number_of_results(self):
+		return len(self.list_store)
