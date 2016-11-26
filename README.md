@@ -9,3 +9,10 @@ Just type and search. It will search for all file types without size limitation 
 #Simple search
 In this section you can configure some search parameters, as shown in the screenshot.
 ![simple_search](https://cloud.githubusercontent.com/assets/5099266/20641239/1fe25f54-b3f4-11e6-9554-73cf2c8cafe3.png)
+
+Getting beogle-gnome-search:
+```bash
+git clone https://github.com/vinsce/beagle-gnome-search.git
+cd beagle-gnome-search/
+python3 source/app.py
+```
