@@ -23,7 +23,7 @@ def default_search(query, path, thread=None, result_list=None, completed_functio
 		completed_function()
 
 
-def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=0, min_size=0):
+def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=0, min_size=0, owner=None):
 	if ignore_case:
 		ignore_case_string = "-iname"
 	else:
@@ -53,6 +53,10 @@ def simple_search(query, path, thread=None, result_list=None, completed_function
 		command.append("-or")
 	command.pop(len(command) - 1)
 	command.append('\)')
+
+	if owner:
+		command.append("-user")
+		command.append(owner)
 	command.append(ignore_case_string)
 	command.append('\'' + query + '\'')
 	p = subprocess.Popen(" ".join(command), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

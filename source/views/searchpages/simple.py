@@ -117,6 +117,20 @@ class SimpleSearchPage(Gtk.Box):
 		min_size_box.pack_end(self.min_size_view, False, True, 0)
 		self.left_panel.add(row_alignment)
 
+		# Min size
+		row = Gtk.ListBoxRow()
+		row_alignment = Gtk.Alignment()
+		row_alignment.set_padding(8, 8, 4, 4)
+		row_alignment.add(row)
+		owner_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=48)
+		row.add(owner_box)
+		owner_label = Gtk.Label(xalign=0)
+		owner_label.set_text("Owner")
+		self.owner_entry = Gtk.Entry(xalign=1)
+		owner_box.pack_start(owner_label, True, True, 0)
+		owner_box.pack_end(self.owner_entry, False, True, 0)
+		self.left_panel.add(row_alignment)
+
 		# Search result view
 		self.result_list = SearchResultView()
 
@@ -196,7 +210,7 @@ class SimpleSearchPage(Gtk.Box):
 
 	def effective_search(self):
 		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.result_list, completed_function=self.search_complete, ignore_case=self.ignoreCase,
-		              search_file=self.searchFile, search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte())
+		              search_file=self.searchFile, search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte(), owner=self.owner_entry.get_text())
 
 	def search_complete(self):
 		self.progress_bar.hide()
