@@ -93,7 +93,10 @@ class SearchResultView(Gtk.TreeView):
 
 	def button_press_event(self, widget, event):
 		if event.button == 3:  # right button click event
-			tree_path = self.get_path_at_pos(int(event.x), int(event.y))[0]
+			try:
+				tree_path = self.get_path_at_pos(int(event.x), int(event.y))[0]
+			except TypeError:  # if no content is selected
+				return
 
 			# creates and shows a popup menu
 			menu = Gtk.Menu()

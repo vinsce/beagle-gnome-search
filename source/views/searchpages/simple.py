@@ -121,7 +121,8 @@ class SimpleSearchPage(Gtk.Box):
 		self.resultList = SearchResultView()
 
 		self.scrolled_window = Gtk.ScrolledWindow()
-		self.scrolled_window.set_hexpand(False)
+		self.scrolled_window.set_hexpand(True)
+		self.scrolled_window.set_min_content_width(300)
 		self.scrolled_window.set_vexpand(True)
 		self.scrolled_window.add(self.resultList)
 		self.scrolled_window.set_margin_bottom(0)
@@ -148,7 +149,6 @@ class SimpleSearchPage(Gtk.Box):
 
 		self.main_panel.pack_start(left_scrolled_window, False, True, 12)
 		self.main_panel.pack_start(self.right_panel, True, True, 0)
-
 
 		self.pack_start(h_box, False, True, 8)
 		self.pack_start(self.main_panel, True, True, 0)
