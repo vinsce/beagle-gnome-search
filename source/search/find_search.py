@@ -23,7 +23,7 @@ def default_search(query, path, thread=None, result_list=None, completed_functio
 		completed_function()
 
 
-def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=0, min_size=0, owner=None):
+def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=0, min_size=0, owner=None, follow_symlink=False):
 	if ignore_case:
 		ignore_case_string = "-iname"
 	else:
@@ -37,7 +37,14 @@ def simple_search(query, path, thread=None, result_list=None, completed_function
 	if search_link:
 		search_type_string += "l"
 
-	command = ["find", path]
+	command = ["find"]
+
+	if follow_symlink:
+		command.append("-L")
+	else:
+		command.append("-P")
+
+	command.append(path)
 
 	if max_size > 0:
 		command.append("-size")

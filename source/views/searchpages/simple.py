@@ -21,6 +21,7 @@ class SimpleSearchPage(Gtk.Box):
 		self.searchDirectory = True
 		self.searchLink = True
 		self.ignoreCase = True
+		self.follow_symlinks = False
 
 		self.gtk_window = gtk_window
 
@@ -117,7 +118,7 @@ class SimpleSearchPage(Gtk.Box):
 		min_size_box.pack_end(self.min_size_view, False, True, 0)
 		self.left_panel.add(row_alignment)
 
-		# Min size
+		# Owner
 		row = Gtk.ListBoxRow()
 		row_alignment = Gtk.Alignment()
 		row_alignment.set_padding(8, 8, 4, 4)
@@ -129,6 +130,22 @@ class SimpleSearchPage(Gtk.Box):
 		self.owner_entry = Gtk.Entry(xalign=1)
 		owner_box.pack_start(owner_label, True, True, 0)
 		owner_box.pack_end(self.owner_entry, False, True, 0)
+		self.left_panel.add(row_alignment)
+
+		# No-Follow Symlinks
+		row = Gtk.ListBoxRow()
+		row_alignment = Gtk.Alignment()
+		row_alignment.set_padding(8, 8, 4, 4)
+		row_alignment.add(row)
+		follow_symlinks_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
+		row.add(follow_symlinks_box)
+		follow_symlinks_label = Gtk.Label(xalign=0)
+		follow_symlinks_label.set_text("Follow symlinks")
+		self.follow_symlinks_switch = Gtk.Switch()
+		self.follow_symlinks_switch.connect("notify::active", self.on_follow_symlinks_changed)
+		self.follow_symlinks_switch.set_active(False)
+		follow_symlinks_box.pack_start(follow_symlinks_label, True, True, 0)
+		follow_symlinks_box.pack_end(self.follow_symlinks_switch, False, True, 0)
 		self.left_panel.add(row_alignment)
 
 		# Search result view
@@ -176,6 +193,10 @@ class SimpleSearchPage(Gtk.Box):
 		ignore_case_value = switch.get_active()
 		self.ignoreCase = ignore_case_value
 
+	def on_follow_symlinks_changed(self, switch, gparam):
+		follow_symlinks_value = switch.get_active()
+		self.follow_symlinks = follow_symlinks_value
+
 	def on_button_toggled(self, button, name):
 		active_value = button.get_active()
 
@@ -210,7 +231,8 @@ class SimpleSearchPage(Gtk.Box):
 
 	def effective_search(self):
 		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.result_list, completed_function=self.search_complete, ignore_case=self.ignoreCase,
-		              search_file=self.searchFile, search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte(), owner=self.owner_entry.get_text())
+		              search_file=self.searchFile, search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte(),
+		              owner=self.owner_entry.get_text(), follow_symlink=self.follow_symlinks)
 
 	def search_complete(self):
 		self.progress_bar.hide()
