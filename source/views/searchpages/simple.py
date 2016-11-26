@@ -137,10 +137,18 @@ class SimpleSearchPage(Gtk.Box):
 		self.status_bar.set_margin_top(0)
 		self.status_bar.set_margin_left(0)
 
-		self.main_panel = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+		self.main_panel = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0, homogeneous=False)
 
-		self.main_panel.pack_start(self.left_panel, False, False, 12)
+		# Scrolled window for the left panel
+		left_scrolled_window = Gtk.ScrolledWindow()
+		left_scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+		left_scrolled_window.set_hexpand(False)
+		left_scrolled_window.set_vexpand(True)
+		left_scrolled_window.add(self.left_panel)
+
+		self.main_panel.pack_start(left_scrolled_window, False, True, 12)
 		self.main_panel.pack_start(self.right_panel, True, True, 0)
+
 
 		self.pack_start(h_box, False, True, 8)
 		self.pack_start(self.main_panel, True, True, 0)
