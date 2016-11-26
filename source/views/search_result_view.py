@@ -10,7 +10,7 @@ from gi.repository import Gtk, Gio, Gdk
 class SearchResultView(Gtk.TreeView):
 	def __init__(self):
 		self.list_store = Gtk.ListStore(str, str, str, str)
-		Gtk.TreeView.__init__(self, model=self.list_store)
+		super().__init__(model=self.list_store)
 
 		# File icon column
 		renderer_pixbuf = Gtk.CellRendererPixbuf()
@@ -19,25 +19,25 @@ class SearchResultView(Gtk.TreeView):
 
 		# File name column
 		renderer_name = Gtk.CellRendererText()
-		column_name = Gtk.TreeViewColumn("Name", renderer_name, text=2)
-		column_name.set_sort_column_id(2)
-		self.set_default_column_properties(column_name)
-		self.append_column(column_name)
+		self.column_name = Gtk.TreeViewColumn("Name", renderer_name, text=2)
+		self.column_name.set_sort_column_id(2)
+		self.set_default_column_properties(self.column_name)
+		self.append_column(self.column_name)
 
 		# File path column
 		renderer_path = Gtk.CellRendererText()
-		column_path = Gtk.TreeViewColumn("Path", renderer_path, text=1)
-		column_path.set_sort_column_id(1)
-		self.set_default_column_properties(column_path)
-		self.append_column(column_path)
+		self.column_path = Gtk.TreeViewColumn("Path", renderer_path, text=1)
+		self.column_path.set_sort_column_id(1)
+		self.set_default_column_properties(self.column_path)
+		self.append_column(self.column_path)
 
 		# File size column
 		renderer_size = Gtk.CellRendererText()
-		column_size = Gtk.TreeViewColumn("Size", renderer_size, text=3)
-		column_size.set_sort_column_id(3)
+		self.column_size = Gtk.TreeViewColumn("Size", renderer_size, text=3)
+		self.column_size.set_sort_column_id(3)
 		self.list_store.set_sort_func(3, self.size_sort_func)
-		self.set_default_column_properties(column_size)
-		self.append_column(column_size)
+		self.set_default_column_properties(self.column_size)
+		self.append_column(self.column_size)
 
 		# Attach a listener to capture the right mouse button click event
 		self.connect('button-press-event', self.button_press_event)
@@ -136,3 +136,8 @@ class SearchResultView(Gtk.TreeView):
 		name = self.list_store.get_value(self.list_store.get_iter(tree_path), 2)
 		file_path = os.path.join(path, name)
 		Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).set_text(file_path, -1)
+
+	def set_is_searching(self, searching):
+		self.column_name.set_clickable(not searching)
+		self.column_path.set_clickable(not searching)
+		self.column_size.set_clickable(not searching)

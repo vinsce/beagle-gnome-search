@@ -118,13 +118,13 @@ class SimpleSearchPage(Gtk.Box):
 		self.left_panel.add(row_alignment)
 
 		# Search result view
-		self.resultList = SearchResultView()
+		self.result_list = SearchResultView()
 
 		self.scrolled_window = Gtk.ScrolledWindow()
 		self.scrolled_window.set_hexpand(True)
 		self.scrolled_window.set_min_content_width(300)
 		self.scrolled_window.set_vexpand(True)
-		self.scrolled_window.add(self.resultList)
+		self.scrolled_window.add(self.result_list)
 		self.scrolled_window.set_margin_bottom(0)
 		self.right_panel.pack_start(self.scrolled_window, True, True, 0)
 		self.progress_bar = Gtk.ProgressBar()
@@ -181,8 +181,10 @@ class SimpleSearchPage(Gtk.Box):
 		self.cancel_button.show()
 		self.progress_bar.show()
 
+		# Notify to the SearchResultView that the search started
+		self.result_list.set_is_searching(True)
 		# clears old search result
-		self.resultList.clear()
+		self.result_list.clear()
 
 		# creates and starts a new thread
 		self.thread = StoppableThread(target=self.effective_search)
@@ -193,8 +195,8 @@ class SimpleSearchPage(Gtk.Box):
 		self.thread.stop()
 
 	def effective_search(self):
-		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.resultList, completed_function=self.search_complete, ignore_case=self.ignoreCase, search_file=self.searchFile,
-		              search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte())
+		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.result_list, completed_function=self.search_complete, ignore_case=self.ignoreCase,
+		              search_file=self.searchFile, search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte())
 
 	def search_complete(self):
 		self.progress_bar.hide()
@@ -206,6 +208,8 @@ class SimpleSearchPage(Gtk.Box):
 			self.status_bar.push(self.context_id, "Search Canceled")
 		else:
 			self.status_bar.push(self.context_id, "Search Completed")
+
+		self.result_list.set_is_searching(False)
 
 	def on_folder_clicked(self, widget):
 		dialog = Gtk.FileChooserDialog("Choose a folder", self.gtk_window, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK))

@@ -38,12 +38,12 @@ class BaseSearchPage(Gtk.Box):
 		h_box.pack_start(self.search_button, False, True, 6)
 		h_box.pack_start(self.cancel_button, False, True, 6)
 
-		self.resultList = SearchResultView()
+		self.result_list = SearchResultView()
 
 		self.scrolled_window = Gtk.ScrolledWindow()
 		self.scrolled_window.set_hexpand(False)
 		self.scrolled_window.set_vexpand(True)
-		self.scrolled_window.add(self.resultList)
+		self.scrolled_window.add(self.result_list)
 		self.scrolled_window.set_margin_bottom(0)
 
 		self.progress_bar = Gtk.ProgressBar()
@@ -72,8 +72,11 @@ class BaseSearchPage(Gtk.Box):
 		self.cancel_button.show()
 		self.progress_bar.show()
 
+		# Notify to the SearchResultView that the search started
+		self.result_list.set_is_searching(True)
+
 		# clears old search result
-		self.resultList.clear()
+		self.result_list.clear()
 
 		# creates and starts a new thread
 		self.thread = StoppableThread(target=self.effective_search)
@@ -84,7 +87,7 @@ class BaseSearchPage(Gtk.Box):
 		self.thread.stop()
 
 	def effective_search(self):
-		default_search(query=self.search_entry.get_text(), path=self.search_path, thread=self.thread, result_list=self.resultList, completed_function=self.search_complete)
+		default_search(query=self.search_entry.get_text(), path=self.search_path, thread=self.thread, result_list=self.result_list, completed_function=self.search_complete)
 
 	def search_complete(self):
 		self.progress_bar.hide()
@@ -95,6 +98,8 @@ class BaseSearchPage(Gtk.Box):
 			self.status_bar.push(self.context_id, "Search Canceled")
 		else:
 			self.status_bar.push(self.context_id, "Search Completed")
+
+		self.result_list.set_is_searching(False)
 
 	def on_folder_clicked(self, widget):
 		dialog = Gtk.FileChooserDialog("Choose a folder", self.gtk_window, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK))
