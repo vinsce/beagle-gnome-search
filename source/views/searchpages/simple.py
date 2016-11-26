@@ -22,6 +22,7 @@ class SimpleSearchPage(Gtk.Box):
 		self.searchLink = True
 		self.ignoreCase = True
 		self.follow_symlinks = False
+		self.include_hidden = True
 
 		self.gtk_window = gtk_window
 
@@ -148,6 +149,22 @@ class SimpleSearchPage(Gtk.Box):
 		follow_symlinks_box.pack_end(self.follow_symlinks_switch, False, True, 0)
 		self.left_panel.add(row_alignment)
 
+		# Include hidden files
+		row = Gtk.ListBoxRow()
+		row_alignment = Gtk.Alignment()
+		row_alignment.set_padding(8, 8, 4, 4)
+		row_alignment.add(row)
+		include_hidden_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
+		row.add(include_hidden_box)
+		include_hidden_label = Gtk.Label(xalign=0)
+		include_hidden_label.set_text("Include hidden")
+		self.include_hidden_switch = Gtk.Switch()
+		self.include_hidden_switch.connect("notify::active", self.on_include_hidden_changed)
+		self.include_hidden_switch.set_active(True)
+		include_hidden_box.pack_start(include_hidden_label, True, True, 0)
+		include_hidden_box.pack_end(self.include_hidden_switch, False, True, 0)
+		self.left_panel.add(row_alignment)
+
 		# Search result view
 		self.result_list = SearchResultView()
 
@@ -197,6 +214,10 @@ class SimpleSearchPage(Gtk.Box):
 		follow_symlinks_value = switch.get_active()
 		self.follow_symlinks = follow_symlinks_value
 
+	def on_include_hidden_changed(self, switch, gparam):
+		include_hidden_value = switch.get_active()
+		self.include_hidden = include_hidden_value
+
 	def on_button_toggled(self, button, name):
 		active_value = button.get_active()
 
@@ -232,7 +253,7 @@ class SimpleSearchPage(Gtk.Box):
 	def effective_search(self):
 		simple_search(query=self.entry.get_text(), path=self.searchPath, thread=self.thread, result_list=self.result_list, completed_function=self.search_complete, ignore_case=self.ignoreCase,
 		              search_file=self.searchFile, search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte(),
-		              owner=self.owner_entry.get_text(), follow_symlink=self.follow_symlinks)
+		              owner=self.owner_entry.get_text(), follow_symlink=self.follow_symlinks, include_hidden=self.include_hidden)
 
 	def search_complete(self):
 		self.progress_bar.hide()

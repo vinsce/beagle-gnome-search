@@ -23,7 +23,8 @@ def default_search(query, path, thread=None, result_list=None, completed_functio
 		completed_function()
 
 
-def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=0, min_size=0, owner=None, follow_symlink=False):
+def simple_search(query, path, thread=None, result_list=None, completed_function=None, ignore_case=True, search_file=True, search_folder=True, search_link=True, max_size=0, min_size=0, owner=None, follow_symlink=False,
+                  include_hidden=True):
 	if ignore_case:
 		ignore_case_string = "-iname"
 	else:
@@ -66,6 +67,12 @@ def simple_search(query, path, thread=None, result_list=None, completed_function
 		command.append(owner)
 	command.append(ignore_case_string)
 	command.append('\'' + query + '\'')
+
+	if not include_hidden:
+		# it excludes only files and folders starting with a dot but not the content of a folder starting with a . To exclude also the content of an hidden folder: \( ! -regex '\..' \)
+		for arg in "\( ! -name '.*' \)".split(" "):
+			command.append(arg)
+
 	p = subprocess.Popen(" ".join(command), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 	if thread:
