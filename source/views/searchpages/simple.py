@@ -205,7 +205,7 @@ class SimpleSearchPage(Gtk.Box):
 
 		response = dialog.run()
 		if response == Gtk.ResponseType.OK:
-			self.folderButton.set_label("Path: " + os.path.split(dialog.get_filename())[1])
+			self.folder_button.set_label("Path: " + os.path.split(dialog.get_filename())[1])
 			self.searchPath = dialog.get_filename()
 
 		dialog.destroy()
