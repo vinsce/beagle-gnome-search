@@ -1,5 +1,3 @@
-import os
-
 import gi
 
 from views.searchpages import base, simple
@@ -12,6 +10,7 @@ from gi.repository import Gtk
 class SearchMainWindow(Gtk.ApplicationWindow):
 	def __init__(self, page="base", *args, **kwargs):
 		super().__init__(*args, **kwargs)
+
 		self.thread = None
 		self.default_page = page
 
@@ -19,14 +18,14 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		self.set_border_width(0)
 		self.set_default_size(800, 500)
 
-		# Headerbar initialization
+		# HeaderBar initialization
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
 
 		# Stack initialization
 		self.stack = Gtk.Stack()
 		self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
-		self.stack.set_transition_duration(1000)
+		self.stack.set_transition_duration(800)
 
 		# First stack page (base)
 		self.base_page = base.BaseSearchPage(gtk_window=self)
@@ -35,7 +34,7 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		self.simple_page = simple.SimpleSearchPage(gtk_window=self)
 		self.stack.add_titled(self.simple_page, "simple", "Simple")
 
-		# Setting stack switcher as headerbar title
+		# Setting stack switcher as HeaderBar title
 		stack_switcher = Gtk.StackSwitcher()
 		stack_switcher.set_stack(self.stack)
 		hb.set_custom_title(stack_switcher)
@@ -44,13 +43,12 @@ class SearchMainWindow(Gtk.ApplicationWindow):
 		# Add stack as window content
 		self.add(self.stack)
 
-		# self.connect("delete-event", Gtk.main_quit)
+		# Show the window
 		self.show_all()
-
 		self.after_show()
 
 	def after_show(self):
-		""" performs same initializations operation. It must be called after SearchMainWindow.show_all()"""
+		""" performs some initializations operation. It must be called after SearchMainWindow.show_all()"""
 		if self.default_page == "base":
 			self.stack.set_visible_child(self.base_page)
 		elif self.default_page == "simple":

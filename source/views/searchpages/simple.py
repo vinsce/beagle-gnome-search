@@ -21,33 +21,31 @@ class SimpleSearchPage(Gtk.Box):
 		self.searchDirectory = True
 		self.searchLink = True
 		self.ignoreCase = True
-		self.max_size = ""
 
 		self.gtk_window = gtk_window
 
-		self.left_panel = Gtk.ListBox()
-		self.left_panel.set_selection_mode(Gtk.SelectionMode.NONE)
 		self.right_panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
 
-		self.folderButton = Gtk.Button("Path: " + os.path.split(self.searchPath)[1])
-		self.folderButton.connect("clicked", self.on_folder_clicked)
+		self.folder_button = Gtk.Button("Path: " + os.path.split(self.searchPath)[1])
+		self.folder_button.connect("clicked", self.on_folder_clicked)
 		self.entry = Gtk.SearchEntry()
-		self.entry.set_text("test*")
 		self.entry.connect("activate", self.execute_search)
-		self.searchButton = Gtk.Button.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON)
-		self.searchButton.connect("clicked", self.execute_search)
+		self.search_button = Gtk.Button.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON)
+		self.search_button.connect("clicked", self.execute_search)
+		self.cancel_button = Gtk.Button.new_from_icon_name("edit-clear-all-symbolic", Gtk.IconSize.BUTTON)
+		self.cancel_button.connect("clicked", self.cancel_search)
 
-		self.cancelButton = Gtk.Button.new_from_icon_name("edit-clear-all-symbolic", Gtk.IconSize.BUTTON)
-		self.cancelButton.connect("clicked", self.cancel_search)
+		h_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
 
-		hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
-
-		hbox.pack_start(self.folderButton, False, True, 12)
-		hbox.pack_start(self.entry, True, True, 0)
-		hbox.pack_start(self.searchButton, False, True, 6)
-		hbox.pack_start(self.cancelButton, False, True, 6)
+		h_box.pack_start(self.folder_button, False, True, 12)
+		h_box.pack_start(self.entry, True, True, 0)
+		h_box.pack_start(self.search_button, False, True, 6)
+		h_box.pack_start(self.cancel_button, False, True, 6)
 
 		# Left panel: search parameters
+		self.left_panel = Gtk.ListBox()
+		self.left_panel.set_selection_mode(Gtk.SelectionMode.NONE)
+
 		# Ignore case switch
 		row = Gtk.ListBoxRow()
 		row_alignment = Gtk.Alignment()
@@ -56,7 +54,7 @@ class SimpleSearchPage(Gtk.Box):
 		ignore_case_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
 		row.add(ignore_case_box)
 		ignore_case_label = Gtk.Label(xalign=0)
-		ignore_case_label.set_markup("<b>Ignore case</b>")
+		ignore_case_label.set_text("Ignore case")
 		self.ignore_case_switch = Gtk.Switch()
 		self.ignore_case_switch.connect("notify::active", self.on_ignore_case_changed)
 		self.ignore_case_switch.set_active(True)
@@ -72,7 +70,7 @@ class SimpleSearchPage(Gtk.Box):
 		file_types_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
 		row.add(file_types_box)
 		file_types_label = Gtk.Label(xalign=0)
-		file_types_label.set_markup("<b>Types</b>")
+		file_types_label.set_text("Types")
 		self.file_type_file_button = Gtk.CheckButton.new_with_label("File")
 		self.file_type_file_button.connect("toggled", self.on_button_toggled, "file")
 		self.file_type_file_button.set_active(True)
@@ -99,7 +97,7 @@ class SimpleSearchPage(Gtk.Box):
 		max_size_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=48)
 		row.add(max_size_box)
 		max_size_label = Gtk.Label(xalign=0)
-		max_size_label.set_markup("<b>Max size</b>")
+		max_size_label.set_text("Max size")
 		self.max_size_view = FileSizeUnitsView()
 		max_size_box.pack_start(max_size_label, True, True, 0)
 		max_size_box.pack_end(self.max_size_view, False, True, 0)
@@ -113,7 +111,7 @@ class SimpleSearchPage(Gtk.Box):
 		min_size_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=48)
 		row.add(min_size_box)
 		min_size_label = Gtk.Label(xalign=0)
-		min_size_label.set_markup("<b>Min size</b>")
+		min_size_label.set_text("Min size")
 		self.min_size_view = FileSizeUnitsView()
 		min_size_box.pack_start(min_size_label, True, True, 0)
 		min_size_box.pack_end(self.min_size_view, False, True, 0)
@@ -122,66 +120,58 @@ class SimpleSearchPage(Gtk.Box):
 		# Search result view
 		self.resultList = SearchResultView()
 
-		self.scrolledwindow = Gtk.ScrolledWindow()
-		self.scrolledwindow.set_hexpand(False)
-		self.scrolledwindow.set_vexpand(True)
-		self.scrolledwindow.add(self.resultList)
-		self.scrolledwindow.set_margin_bottom(0)
-		self.right_panel.pack_start(self.scrolledwindow, True, True, 0)
-		self.progressbar = Gtk.ProgressBar()
+		self.scrolled_window = Gtk.ScrolledWindow()
+		self.scrolled_window.set_hexpand(False)
+		self.scrolled_window.set_vexpand(True)
+		self.scrolled_window.add(self.resultList)
+		self.scrolled_window.set_margin_bottom(0)
+		self.right_panel.pack_start(self.scrolled_window, True, True, 0)
+		self.progress_bar = Gtk.ProgressBar()
 
 		self.timeout_id = GObject.timeout_add(50, self.on_timeout, None)
 
-		self.statusbar = Gtk.Statusbar()
-		self.context_id = self.statusbar.get_context_id("search_cid")
-		self.statusbar.push(self.context_id, "Searching is fun!")
-		self.statusbar.set_margin_bottom(0)
-		self.statusbar.set_margin_top(0)
-		self.statusbar.set_margin_left(0)
+		self.status_bar = Gtk.Statusbar()
+		self.context_id = self.status_bar.get_context_id("search_cid")
+		self.status_bar.push(self.context_id, "Searching is fun!")
+		self.status_bar.set_margin_bottom(0)
+		self.status_bar.set_margin_top(0)
+		self.status_bar.set_margin_left(0)
 
 		self.main_panel = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
 
 		self.main_panel.pack_start(self.left_panel, False, False, 12)
 		self.main_panel.pack_start(self.right_panel, True, True, 0)
 
-		self.pack_start(hbox, False, True, 8)
+		self.pack_start(h_box, False, True, 8)
 		self.pack_start(self.main_panel, True, True, 0)
 
-		self.pack_start(self.progressbar, False, True, 0)
-		self.progressbar.pulse()
+		self.pack_start(self.progress_bar, False, True, 0)
+		self.progress_bar.pulse()
 
-		self.pack_start(self.statusbar, False, False, 0)
+		self.pack_start(self.status_bar, False, False, 0)
 
 	def on_ignore_case_changed(self, switch, gparam):
-		if switch.get_active():
-			self.ignoreCase = True
-		else:
-			self.ignoreCase = False
+		ignore_case_value = switch.get_active()
+		self.ignoreCase = ignore_case_value
 
 	def on_button_toggled(self, button, name):
-		if button.get_active():
-			if name == "file":
-				self.searchFile = True
-			elif name == "folder":
-				self.searchDirectory = True
-			if name == "link":
-				self.searchLink = True
-		else:
-			if name == "file":
-				self.searchFile = False
-			elif name == "folder":
-				self.searchDirectory = False
-			if name == "link":
-				self.searchLink = False
+		active_value = button.get_active()
+
+		if name == "file":
+			self.searchFile = active_value
+		elif name == "folder":
+			self.searchDirectory = active_value
+		if name == "link":
+			self.searchLink = active_value
 
 	def on_timeout(self, user_data):
-		self.progressbar.pulse()
+		self.progress_bar.pulse()
 		return True
 
 	def execute_search(self, button):
-		self.searchButton.hide()
-		self.cancelButton.show()
-		self.progressbar.show()
+		self.search_button.hide()
+		self.cancel_button.show()
+		self.progress_bar.show()
 
 		# clears old search result
 		self.resultList.clear()
@@ -189,7 +179,7 @@ class SimpleSearchPage(Gtk.Box):
 		# creates and starts a new thread
 		self.thread = StoppableThread(target=self.effective_search)
 		self.thread.start()
-		self.statusbar.push(self.context_id, "Search started...")
+		self.status_bar.push(self.context_id, "Search started...")
 
 	def cancel_search(self, button):
 		self.thread.stop()
@@ -199,15 +189,15 @@ class SimpleSearchPage(Gtk.Box):
 		              search_folder=self.searchDirectory, search_link=self.searchLink, max_size=self.max_size_view.get_size_byte(), min_size=self.min_size_view.get_size_byte())
 
 	def search_complete(self):
-		self.progressbar.hide()
+		self.progress_bar.hide()
 
-		self.searchButton.show()
-		self.cancelButton.hide()
+		self.search_button.show()
+		self.cancel_button.hide()
 
 		if self.thread.stopped():
-			self.statusbar.push(self.context_id, "Search Canceled")
+			self.status_bar.push(self.context_id, "Search Canceled")
 		else:
-			self.statusbar.push(self.context_id, "Search Completed")
+			self.status_bar.push(self.context_id, "Search Completed")
 
 	def on_folder_clicked(self, widget):
 		dialog = Gtk.FileChooserDialog("Choose a folder", self.gtk_window, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK))
@@ -215,15 +205,11 @@ class SimpleSearchPage(Gtk.Box):
 
 		response = dialog.run()
 		if response == Gtk.ResponseType.OK:
-			print("Select clicked")
-			print("Folder selected: " + dialog.get_filename())
 			self.folderButton.set_label("Path: " + os.path.split(dialog.get_filename())[1])
 			self.searchPath = dialog.get_filename()
-		elif response == Gtk.ResponseType.CANCEL:
-			print("Cancel clicked")
 
 		dialog.destroy()
 
 	def after_show(self):
-		self.cancelButton.hide()
-		self.progressbar.hide()
+		self.cancel_button.hide()
+		self.progress_bar.hide()

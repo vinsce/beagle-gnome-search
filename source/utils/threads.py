@@ -6,6 +6,8 @@ class StoppableThread(threading.Thread):
 
 	def __init__(self, target=None):
 		super(StoppableThread, self).__init__(target=target)
+
+		self.pid = None
 		self._stop = threading.Event()
 
 	def set_pid(self, pid):

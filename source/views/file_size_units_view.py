@@ -7,8 +7,10 @@ unit_mult = {"byte": 1, "kb": 1024, "mb": 1048576, "gb": 1073741824}
 
 
 class FileSizeUnitsView(Gtk.Box):
+	""" view that displays an entry for size input and 4 buttons to choose the size unit """
+
 	def __init__(self):
-		super().__init__(self, orientation=Gtk.Orientation.HORIZONTAL, spacing=4, homogeneous=False)
+		super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=4, homogeneous=False)
 
 		self.size_entry = Gtk.Entry(xalign=1)
 		self.size_entry.set_width_chars(5)
@@ -51,6 +53,5 @@ class FileSizeUnitsView(Gtk.Box):
 		try:
 			return int(self.size_entry.get_text()) * unit_mult[self.selected_unit]
 		except ValueError:
-			print("Invalid size")
 			self.size_entry.set_text("")
 			return 0
