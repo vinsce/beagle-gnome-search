@@ -58,8 +58,8 @@ class Application(Gtk.Application):
 
 	# Functions used to handle top menu actions: about, quit and preferences
 	def on_about(self, action, param):
-		about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True, authors=["<a href=\"mailto:vincenzo.cerminara94@gmail.com\">Vincenzo Cerminara</a>"], comments="A search tool for GNOME.", version="0.1",
-		                               program_name="GSearch")
+		about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True, authors=["<a href=\"mailto:vincenzo.cerminara94@gmail.com\">Vincenzo Cerminara</a>"], comments="A search tool for GNOME.", version="0.1.1",
+		                               program_name="Beagle Gnome Search", website="https://github.com/vinsce/beagle-gnome-search")
 		about_dialog.present()
 
 	def on_quit(self, action, param):
